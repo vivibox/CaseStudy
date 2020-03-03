@@ -1,0 +1,64 @@
+/*
+	Install gradle at https://gradle.org/ and execute 'gradle run' or 'gradle SimpleClient'
+	in this directory to run an example. Other examples can be run
+	with the commands 'gradle SimpleThing' and 'gradle Steam'.
+
+	You can also generate an Eclipse project with the command 'gradle eclipse' or
+	install the gradle eclipse plugin from the Eclipse Marketplace and Import it into eclipse.
+*/
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = '1.0'
+
+mainClassName = "com.thingworx.sdk.simple.SimpleClient"
+
+// Customize the settings below to run the SteamClient
+project.ext {
+	serverUrl = "ws://localhost:8080/Thingworx/WS"
+	appKey = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  // Create this in Thingworx xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+	scanRate = "1000" //ms
+	numberOfSensors = "10" // The number of sensors to create
+	startSensor = "1" // The starting number for the first sensor
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		resources {
+			srcDir 'resources'
+		}
+
+	}
+}
+
+dependencies {
+	compile fileTree(dir: '../lib', include: ['*.jar'])
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.2'
+	
+}
+
+task SimpleClient(type: JavaExec) {
+	dependsOn "build"
+	classpath = sourceSets.main.runtimeClasspath
+	main = "com.thingworx.sdk.simple.SimpleClient"
+}
+
+task SimpleThing(type: JavaExec) {
+	dependsOn "build"
+	classpath = sourceSets.main.runtimeClasspath
+	main = "com.thingworx.sdk.simplething.SimpleThingClient"
+}
+
+task Steam(type: JavaExec) {
+	dependsOn "build"
+	classpath = sourceSets.main.runtimeClasspath
+	main = "com.thingworx.sdk.steam.SteamSensorClient"
+	args project.ext.serverUrl,project.ext.appKey,project.ext.scanRate,project.ext.startSensor,project.ext.numberOfSensors
+}
